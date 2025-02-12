@@ -10,9 +10,9 @@ import Nav from '../Nav/Nav';
 import HomePage from '../HomePage/HomePage';
 import LoginPage from '../LoginPage/LoginPage';
 import RegisterPage from '../RegisterPage/RegisterPage';
-import Routines from '../Routines';
-import Log from '../Log';
-import Progress from '../Progress';
+import Log from '../Log/Log';
+import Progress from '../Progress/Progress';
+import Routines from '../Routines/Routines';
 function App() {
   const user = useStore((state) => state.user);
   const fetchUser = useStore((state) => state.fetchUser);
@@ -58,6 +58,18 @@ function App() {
                 <RegisterPage /> // Render RegisterPage for unauthenticated user.
               )
             }
+          />
+          <Route
+          exact path= "/Log"
+          element={<Log />}
+          />
+          <Route
+          exact path= "/Progress"
+          element={<Progress />}
+          />
+          <Route
+          exact path= "/Routines"
+          element={<Routines />}
           />
           <Route 
             exact path="/about"

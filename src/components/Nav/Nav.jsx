@@ -27,13 +27,13 @@ function Nav() {
               <NavLink to="/">Home</NavLink>
             </li>
             <li>
-              <NavLink to="/">Log</NavLink>
+              <NavLink to="/Log">Log</NavLink>
             </li>
             <li>
-            <NavLink to="/">Progress</NavLink>
+            <NavLink to="/Progress">Progress</NavLink>
             </li>
             <li>
-            <NavLink to="/">Routine</NavLink>
+            <NavLink to="/Routines">Routines</NavLink>
             </li>
           </>
         )

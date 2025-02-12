@@ -1,3 +1,4 @@
+
 function Log() {
     return (
       <div className="Log">

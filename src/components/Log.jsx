@@ -1,10 +1,10 @@
-function log() {
+function Log() {
     return (
-      <div className="log">
-        <h1>log</h1>
+      <div className="Log">
+        <h1>Log</h1>
       </div>
     );
   }
   
-  export default log;
+  export default Log;
   

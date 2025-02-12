@@ -1,10 +1,10 @@
-function routines() {
+function Routines() {
     return (
-      <div className="routines">
-        <h1>routines</h1>
+      <div className="Routines">
+        <h1>Routines</h1>
       </div>
     );
   }
   
-  export default routines;
+  export default Routines;
   

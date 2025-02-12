@@ -26,6 +26,15 @@ function Nav() {
             <li>
               <NavLink to="/">Home</NavLink>
             </li>
+            <li>
+              <NavLink to="/">Log</NavLink>
+            </li>
+            <li>
+            <NavLink to="/">Progress</NavLink>
+            </li>
+            <li>
+            <NavLink to="/">Routine</NavLink>
+            </li>
           </>
         )
       }
@@ -33,6 +42,8 @@ function Nav() {
         <li>
           <NavLink to="/about">About</NavLink>
         </li>
+
+
       </ul>
     </nav>
   );

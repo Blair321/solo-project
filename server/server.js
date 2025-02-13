@@ -24,7 +24,6 @@ app.use(passport.session());
 
 // Apply router files:
 app.use('/api/user', userRouter);
-
 // Start the server:
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);

@@ -15,6 +15,7 @@ const passport = require('./strategies/user.strategy');
 const userRouter = require('./routes/user.router');
 const exercisesRouter = require('./routes/exercises.router');
 const progressionRouter = require('./routes/progression.router')
+const routinesRouter = require('./routes/routines.router');
 // Apply middleware:
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -27,6 +28,7 @@ app.use(passport.session());
 app.use('/api/user', userRouter);
 app.use('/api/exercises', exercisesRouter);
 app.use('/api/progression', progressionRouter);
+app.use('/api/routines', routinesRouter);
 // Start the server:
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);

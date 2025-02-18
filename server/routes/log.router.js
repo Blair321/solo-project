@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../modules/pool');
-const { route } = require('./user.router');
 
 // first route for the exercise-log table
 

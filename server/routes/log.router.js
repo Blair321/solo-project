@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../modules/pool');
 
-// first route for the exercise-log table
+//first route for the exercise-log table
 
 router.get('/', (req, res) => {
     pool.query('SELECT * FROM "exercise_log";').then((result) => {
@@ -12,6 +12,8 @@ router.get('/', (req, res) => {
         res.sendStatus(500);  
     });
 })
+
+
 
 router.post('/', (req, res) => {
     const { exercise_id, set_number, reps, weight, exertion_level, user_id } = req.body;

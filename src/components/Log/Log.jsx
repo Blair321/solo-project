@@ -9,7 +9,7 @@ function Log() {
 
   function fetchLogList() {
     console.log('in FetchLogList');
-    axios.get('/api/log')
+    axios.get('/api/log/all')
     .then(function(response)
     {setLogList(response.data);
     }).catch(function(err){
@@ -18,13 +18,27 @@ function Log() {
     })
     
   }
-
   return(
-  <div>
-<p>{JSON.stringify(logList)}</p>
+//   <div>
+// <p>{JSON.stringify(logList)}</p>
 
-  </div>
-
+//   </div>
+<div>
+      <h2>Exercise Log List</h2>
+      <ul>
+        {logList.length > 0 ? (
+          logList.map((log) => (
+            <li key={log.log_id}>
+              <strong>Exercise ID:</strong> {log.exercise_id}, <strong>Set:</strong> {log.set_number}, 
+              <strong>Reps:</strong> {log.reps}, <strong>Weight:</strong> {log.weight}, 
+              <strong>Exertion Level:</strong> {log.exertion_level}
+            </li>
+          ))
+        ) : (
+          <p>No logs available.</p>
+        )}
+      </ul>
+    </div>
   );
 }
 export default Log;

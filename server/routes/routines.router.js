@@ -14,5 +14,5 @@ router.get('/', rejectUnauthenticated ,(req, res) => {
         res.sendStatus(400);
     })
     
-})
+});
   module.exports = router;

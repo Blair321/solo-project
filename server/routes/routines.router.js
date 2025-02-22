@@ -15,12 +15,11 @@ router.get('/', rejectUnauthenticated ,(req, res) => {
     })
     
 });
-router.post('/api/routines', async (req, res) => {
+router.post('/', async (req, res) => {
     const { routine_name, exercises } = req.body;  // `exercises` is an array with objects like { exercise_name, sets, reps }
-  
     try {
       // Step 1: Insert new routine into workout_routines
-      const routineResult = await db.query(`
+      const routineResult = await pool.query(`
         INSERT INTO workout_routines (routine_name) 
         VALUES ($1) 
         RETURNING routine_id;
@@ -31,7 +30,7 @@ router.post('/api/routines', async (req, res) => {
       // Step 2: Insert new exercises or get existing exercises
       for (const exercise of exercises) {
         // Check if the exercise already exists in the exercises table
-        const existingExerciseResult = await db.query(`
+        const existingExerciseResult = await pool.query(`
           SELECT exercise_id FROM exercises_pool 
           WHERE exercise_name = $1;
         `, [exercise.exercise_name]);
@@ -43,7 +42,7 @@ router.post('/api/routines', async (req, res) => {
           exerciseId = existingExerciseResult.rows[0].exercise_id;
         } else {
           // If exercise doesn't exist, insert it and get the new exercise_id
-          const newExerciseResult = await db.query(`
+          const newExerciseResult = await pool.query(`
             INSERT INTO exercises_pool (exercise_name)
             VALUES ($1)
             RETURNING exercise_id;
@@ -53,7 +52,7 @@ router.post('/api/routines', async (req, res) => {
         }
   
         // Step 3: Insert exercise details into exercises_routine
-        await db.query(`
+        await pool.query(`
           INSERT INTO exercises_routine (routine_id, exercise_id, sets, reps) 
           VALUES ($1, $2, $3, $4);
         `, [routineId, exerciseId, exercise.sets, exercise.reps]);

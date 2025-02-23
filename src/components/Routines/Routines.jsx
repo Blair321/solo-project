@@ -6,6 +6,11 @@ const Routines = () => {
   const [exercises, setExercises] = useState([{ exercise_name: '', sets: '', reps: '' }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [createdRoutine, setCreatedRoutine] = useState(null); // State to store created routine
+
+  useEffect(() => {
+    console.log('Created Routine:', createdRoutine);  // Logs when createdRoutine changes
+  }, [createdRoutine]); // Runs whenever createdRoutine state changes
 
   // Handle adding a new exercise field
   const handleAddExercise = () => {
@@ -39,6 +44,7 @@ const Routines = () => {
       // Make API request to create routine and exercises
       const response = await axios.post('/api/routines', routineData);
       alert(response.data.message);  // Show success message
+      setCreatedRoutine(response.data.routine);
     } catch (err) {
       setError('Failed to create routine and add exercises');
       console.error(err);
@@ -117,6 +123,22 @@ const Routines = () => {
 
       {/* Error message */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
+        {/* Display the newly created routine */}
+        {createdRoutine && (
+      <div>
+          <h3>Created Routine:</h3>
+          <p><strong>Routine Name:</strong> {createdRoutine.routine_name}</p>
+          <h4>Exercises:</h4>
+          <ul>
+            {createdRoutine.exercises.map((exercise, index) => (
+              <li key={index}>
+                {exercise.exercise_name} - {exercise.sets} sets of {exercise.reps} reps
+              </li>
+            ))}
+          </ul>
+        </div>
+        )}
+      
     </div>
   );
 };

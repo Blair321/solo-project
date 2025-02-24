@@ -102,6 +102,7 @@ const Log = () => {
           onChange={(e) => setUserId(e.target.value)}
           required
         />
+        <p>{JSON.stringify(logList)}</p>
       </div>
       <button type="submit">Submit Log</button>
     </form>

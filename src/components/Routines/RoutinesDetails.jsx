@@ -6,7 +6,8 @@ import {useParams, useNavigate } from "react-router-dom"
 const fetcher = url => axios.get(url).then(res => res.data);
 
 const RoutineDetails = () => {
-    const { routineId } = useParams();
+
+    const { routineId  } = useParams();
     console.log(routineId);
 const { data: routine, error,isLoading } = useSWR(
     routineId ? `/api/routines/${routineId}` : null,  // Only fetch if routineId is set
@@ -40,7 +41,7 @@ const { data: routine, error,isLoading } = useSWR(
           <li key={exercise.exercise_id}>
             {exercise.exercise_name} - {exercise.sets} sets of {exercise.reps} reps
             <button onClick={() => {
-                debugger; handleExerciseDelete(exercise.routine_exercise_id);
+             handleExerciseDelete(exercise.routine_exercise_id);
             }}>
               Delete
             </button>

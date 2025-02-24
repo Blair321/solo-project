@@ -1,31 +1,31 @@
 import { useState,useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const Routines = () => {
   const [routineName, setRoutineName] = useState('');
-  const [exercises, setExercises] = useState([{ exercise_name: '', sets: '', reps: '' }]);
+  const [exercises, setExercises] = useState([{ exercise_name: '', sets: '', reps: '', routine_exercise_id:'' }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [createdRoutine, setCreatedRoutine] = useState(null); // State to store created routine
   const [routineId, setRoutineId] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchRoutine = async () => {
-  //     if (!routineId) return;  // Don't fetch if there is no routineId
+  useEffect(() => {
+    const fetchRoutine = async () => {
+      if (!routineId) return;  // Don't fetch if there is no routineId
 
-  //     try {
-  //       const response = await axios.get(`/api/routines/${routineId}`);
-  //       setCreatedRoutine(response.data);
-  //     } catch (err) {
-  //       setError('Failed to fetch routine details');
-  //       console.error(err);
-  //     }
-  //   };
-  //   fetchRoutine();
-  // }, [routineId]);  
+      try {
+        const response = await axios.get(`/api/routines/${routineId}`);
+        setCreatedRoutine(response.data);
+      } catch (err) {
+        setError('Failed to fetch routine details');
+        console.error(err);
+      }
+    };
+    fetchRoutine();
+  }, [routineId]);  
   // Handle adding a new exercise field
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const handleAddExercise = () => {
     setExercises([...exercises, { exercise_name: '', sets: '', reps: '' }]);
   };
@@ -58,7 +58,6 @@ const Routines = () => {
       const response = await axios.post('/api/routines', routineData);
       alert(response.data.message);  // Show success message
       setRoutineId(response.data.routineId);
-      navigate(`/RoutineDetails/${response.data.routineId}`);
     } catch (err) {
       setError('Failed to create routine and add exercises');
       console.error(err);
@@ -67,6 +66,45 @@ const Routines = () => {
     }
   };
 
+  const handleUpdateExercise = async (routineExerciseId, updatedSets, updatedReps) => {
+    try {
+      const response = await axios.put(`/api/routines/exercises/${routineExerciseId}`, {
+        sets: updatedSets,
+        reps: updatedReps,
+      });
+
+      // Update the exercise in the exercises list after successful update
+      const updatedExercises = exercises.map(exercise =>
+        exercise.routine_exercise_id === routineExerciseId
+          ? { ...exercise, sets: updatedSets, reps: updatedReps }
+          : exercise
+      );
+
+      setExercises(updatedExercises);
+      alert(response.data.message);
+    } catch (err) {
+      alert('Failed to update exercise');
+      console.error(err);
+    }
+  };
+  const handleDeleteExercise = async (routineExerciseId) => {
+    try {
+      const response = await axios.delete(`/api/routines/exercises/${routineExerciseId}`);
+      alert(response.data.message);
+
+      // After deleting, update the exercise list in state
+      const updatedExercises = createdRoutine.exercises.filter(
+        (exercise) => exercise.routine_exercise_id !== routineExerciseId
+      );
+      setCreatedRoutine((prevState) => ({
+        ...prevState,
+        exercises: updatedExercises,
+      }));
+    } catch (err) {
+      alert('Failed to delete exercise');
+      console.error(err);
+    }
+  };
   return (
     <div>
       <h2>Add New Routine</h2>
@@ -138,46 +176,38 @@ const Routines = () => {
       {/* Error message */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
         {/* Display the newly created routine */}
-        {/* {createdRoutine && (
+        {createdRoutine && (
       <div>
           <h3>Created Routine:</h3>
           <p><strong>Routine Name:</strong> {createdRoutine.routine_name}</p>
           <h4>Exercises:</h4>
           <ul>
-            {createdRoutine.exercises.map((exercise, index) => (
-              <li key={index}>
+            {createdRoutine.exercises.map((exercise) => (
+              <li key={exercise.routine_exercise_id}>
                 {exercise.exercise_name} - {exercise.sets} sets of {exercise.reps} reps
+                <button
+                  onClick={() => handleDeleteExercise(exercise.routine_exercise_id)}
+                  style={{ marginLeft: "10px", color: "red" }}
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => handleUpdateExercise(exercise.routine_exercise_id, exercise.sets, exercise.reps)}
+                  style={{ marginLeft: '10px' }}
+                >
+                  Update
+                </button>
               </li>
             ))}
           </ul>
         </div>
         )}
-       */}
+      
     </div>
   );
 };
   
-  // const [routinesList,setRoutinesList] =  useState([]);
-  // useEffect(()=>{
-  //   fetchRoutines()
-  // },[]);
-  // function fetchRoutines() {
-  //   console.log('in fetch routines');
-  //   axios.get('/api/routines').then(function(response){
-  //     setRoutinesList(response.data);
-  //   }).catch(function(err){
-  //     console.log(err);
-  //     alert('error getting the routines list')
-      
-  //   })
-    
-  // }
-  //   return (
-  //     <div className="Routines">
-  //       <h1>Routines</h1>
-  //       <p>{JSON.stringify(routinesList)}</p>
-  //     </div>
-  //   );
+
   
   export default Routines;
   

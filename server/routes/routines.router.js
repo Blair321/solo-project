@@ -16,6 +16,8 @@ const { rejectUnauthenticated, } = require ('../modules/authentication-middlewar
     
 // });
 router.post('/', async (req, res) => {
+  console.log(req.body);
+  
     const { routine_name, exercises_pool } = req.body;  // `exercises` is an array with objects like { exercise_name, sets, reps }
     try {
       // Step 1: Insert new routine into workout_routines
@@ -43,7 +45,7 @@ router.post('/', async (req, res) => {
         } else {
           // If exercise doesn't exist, insert it and get the new exercise_id
           const newExerciseResult = await pool.query(`
-            INSERT INTO exercises (exercise_name)
+            INSERT INTO exercises_pool (exercise_name)
             VALUES ($1)
             RETURNING exercise_id;
           `, [exercise.exercise_name]);
@@ -66,6 +68,8 @@ router.post('/', async (req, res) => {
     }
   });
   router.get('/:id', async (req, res) => {
+    console.log(req.params.id);
+    
     const routineId = req.params.id;
   
     try {
@@ -121,6 +125,31 @@ router.delete('/exercises/:routineExerciseId', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to delete exercise from routine' });
+  }
+});
+router.put('/exercises/:routineExerciseId', async (req, res) => {
+  const { routineExerciseId } = req.params; // Get the routine_exercise_id from the URL params
+  const { sets, reps } = req.body; // Get the updated sets and reps from the request body
+
+  try {
+    // Step 1: Update the exercise in the exercises_routine table
+    const updateResult = await pool.query(`
+      UPDATE exercises_routine
+      SET sets = $1, reps = $2
+      WHERE routine_exercise_id = $3
+      RETURNING routine_exercise_id, sets, reps;
+    `, [sets, reps, routineExerciseId]);
+
+    // If no rows are affected, the exercise was not found
+    if (updateResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Exercise not found in the routine' });
+    }
+
+    // Step 2: Send success response with the updated exercise
+    res.status(200).json({ message: 'Exercise updated successfully', exercise: updateResult.rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update exercise' });
   }
 });
 

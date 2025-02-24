@@ -6,7 +6,7 @@ const { rejectUnauthenticated, } = require ('../modules/authentication-middlewar
 
 router.get('/all',(req, res) => {
     console.log('in exerciselog route');
-    const sqlText = 'SELECT * FROM "exercise_log"';
+    const sqlText = 'SELECT * FROM "exercise_records"';
     pool.query(sqlText)
     .then((result) => {
         res.send(result.rows);

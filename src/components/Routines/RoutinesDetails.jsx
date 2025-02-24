@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import axios from "axios";
-import {useParams} from "react-router-dom"
+import {useParams, useNavigate } from "react-router-dom"
 
 
 const fetcher = url => axios.get(url).then(res => res.data);
@@ -14,6 +14,18 @@ const { data: routine, error,isLoading } = useSWR(
   );
   if (error) return <p style={{ color: 'red' }}>Failed to load routine details</p>;
 
+  const handleExerciseDelete = async (routineExerciseId) => {
+    
+    try {
+      await axios.delete(`/api/routines/exercises/${routineExerciseId}`);
+      alert("Exercise deleted successfully");
+       // Re-fetch the data to get the updated routine
+       useNavigate('/Routines')
+    } catch (err) {
+      alert("Failed to delete exercise");
+      console.error(err);
+    }
+  };
   // Handling loading state
   if (isLoading) return <p>Loading...</p>;
 
@@ -25,11 +37,17 @@ const { data: routine, error,isLoading } = useSWR(
       <h3>Exercises:</h3>
       <ul>
         {routine.exercises.map((exercise, index) => (
-          <li key={index}>
+          <li key={exercise.exercise_id}>
             {exercise.exercise_name} - {exercise.sets} sets of {exercise.reps} reps
+            <button onClick={() => {
+                debugger; handleExerciseDelete(exercise.routine_exercise_id);
+            }}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
+       
     </div>
   );
 };

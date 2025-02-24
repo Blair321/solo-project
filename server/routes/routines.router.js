@@ -82,7 +82,7 @@ router.post('/', async (req, res) => {
   
       // Step 2: Get the exercises associated with the routine
       const exercisesResult = await pool.query(`
-        SELECT e.exercise_name, er.sets, er.reps
+        SELECT er.*, e.exercise_name
         FROM exercises_routine er
         JOIN exercises_pool e ON er.exercise_id = e.exercise_id
         WHERE er.routine_id = $1;
@@ -99,6 +99,30 @@ router.post('/', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch routine and exercises' });
     }
   });
-  
+  // Route to delete an exercise from a specific routine by its ID
+router.delete('/exercises/:routineExerciseId', async (req, res) => {
+  const { routineExerciseId } = req.params; // Get the routine_exercise_id from the URL params
+
+  try {
+    // Step 1: Delete the specific exercise from the exercises_routine table
+    const deleteResult = await pool.query(`
+      DELETE FROM exercises_routine
+      WHERE routine_exercise_id = $1
+      RETURNING routine_exercise_id;
+    `, [routineExerciseId]);
+
+    // If no rows are affected, the exercise was not found
+    if (deleteResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Exercise not found in the routine' });
+    }
+
+    // Step 2: Send success response
+    res.status(200).json({ message: 'Exercise deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete exercise from routine' });
+  }
+});
+
   
   module.exports = router;

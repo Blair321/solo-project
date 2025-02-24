@@ -1,18 +1,31 @@
 import { useState,useEffect } from "react";
 import axios from "axios";
-// function Routines() {// components/CreateRoutineForm.js
+import { useNavigate } from "react-router-dom";
+
 const Routines = () => {
   const [routineName, setRoutineName] = useState('');
   const [exercises, setExercises] = useState([{ exercise_name: '', sets: '', reps: '' }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [createdRoutine, setCreatedRoutine] = useState(null); // State to store created routine
+  const [routineId, setRoutineId] = useState(null);
 
-  useEffect(() => {
-    console.log('Created Routine:', createdRoutine);  // Logs when createdRoutine changes
-  }, [createdRoutine]); // Runs whenever createdRoutine state changes
+  // useEffect(() => {
+  //   const fetchRoutine = async () => {
+  //     if (!routineId) return;  // Don't fetch if there is no routineId
 
+  //     try {
+  //       const response = await axios.get(`/api/routines/${routineId}`);
+  //       setCreatedRoutine(response.data);
+  //     } catch (err) {
+  //       setError('Failed to fetch routine details');
+  //       console.error(err);
+  //     }
+  //   };
+  //   fetchRoutine();
+  // }, [routineId]);  
   // Handle adding a new exercise field
+  const navigate = useNavigate();
   const handleAddExercise = () => {
     setExercises([...exercises, { exercise_name: '', sets: '', reps: '' }]);
   };
@@ -34,7 +47,7 @@ const Routines = () => {
       // Prepare request data
       const routineData = {
         routine_name: routineName,
-        exercises: exercises.map(exercise => ({
+        exercises_pool: exercises.map(exercise => ({
           exercise_name: exercise.exercise_name,
           sets: exercise.sets,
           reps: exercise.reps,
@@ -44,7 +57,8 @@ const Routines = () => {
       // Make API request to create routine and exercises
       const response = await axios.post('/api/routines', routineData);
       alert(response.data.message);  // Show success message
-      setCreatedRoutine(response.data.routine);
+      setRoutineId(response.data.routineId);
+      navigate(`/RoutineDetails/${response.data.routineId}`);
     } catch (err) {
       setError('Failed to create routine and add exercises');
       console.error(err);
@@ -124,7 +138,7 @@ const Routines = () => {
       {/* Error message */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
         {/* Display the newly created routine */}
-        {createdRoutine && (
+        {/* {createdRoutine && (
       <div>
           <h3>Created Routine:</h3>
           <p><strong>Routine Name:</strong> {createdRoutine.routine_name}</p>
@@ -138,7 +152,7 @@ const Routines = () => {
           </ul>
         </div>
         )}
-      
+       */}
     </div>
   );
 };

@@ -13,6 +13,7 @@ import RegisterPage from '../RegisterPage/RegisterPage';
 import Log from '../Log/Log';
 import Progress from '../Progress/Progress';
 import Routines from '../Routines/Routines';
+import RoutineDetails from '../Routines/RoutinesDetails';
 function App() {
   const user = useStore((state) => state.user);
   const fetchUser = useStore((state) => state.fetchUser);
@@ -70,6 +71,10 @@ function App() {
           <Route
           exact path= "/Routines"
           element={<Routines />}
+          />
+            <Route
+          exact path= "/Routines/:routineId"
+          element={<RoutineDetails />}
           />
           <Route 
             exact path="/about"

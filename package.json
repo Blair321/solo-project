@@ -6,6 +6,7 @@
     "node": ">=18.x"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.0.8",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "connect-pg-simple": "^9.0.1",
@@ -19,6 +20,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.26.2",
     "swr": "^2.3.2",
+    "tailwindcss": "^4.0.8",
     "zustand": "^4.5.4"
   },
   "scripts": {

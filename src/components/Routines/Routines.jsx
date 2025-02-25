@@ -31,11 +31,32 @@ const Routines = () => {
   };
 
   // Handle input changes for each exercise field
+
   const handleExerciseChange = (index, field, value) => {
     const updatedExercises = [...exercises];
     updatedExercises[index][field] = value;
     setExercises(updatedExercises);
   };
+  const handleExerciseChanges = (routineExerciseId, field, value) => {
+    const updatedExercises = exercises.map(exercise =>
+      exercise.routine_exercise_id === routineExerciseId
+        ? { ...exercise, [field]: value }
+        : exercise
+    );
+    setExercises(updatedExercises);
+    if (createdRoutine) {
+      const updatedCreatedRoutine = {
+        ...createdRoutine,
+        exercises: createdRoutine.exercises.map(exercise =>
+          exercise.routine_exercise_id === routineExerciseId
+            ? { ...exercise, [field]: value }
+            : exercise
+        ),
+      };
+      setCreatedRoutine(updatedCreatedRoutine);
+    }
+  };
+  
 
   // Handle submitting the form
   const handleSubmit = async (e) => {
@@ -81,6 +102,17 @@ const Routines = () => {
       );
 
       setExercises(updatedExercises);
+      if (createdRoutine) {
+        const updatedCreatedRoutine = {
+          ...createdRoutine,
+          exercises: createdRoutine.exercises.map(exercise =>
+            exercise.routine_exercise_id === routineExerciseId
+              ? { ...exercise, sets: updatedSets, reps: updatedReps }
+              : exercise
+          ),
+        };
+        setCreatedRoutine(updatedCreatedRoutine);
+      }
       alert(response.data.message);
     } catch (err) {
       alert('Failed to update exercise');
@@ -106,107 +138,151 @@ const Routines = () => {
     }
   };
   return (
+  
+<div className="flex justify-between space-x-6">
+{/* Left Side: Routine Creation Form */}
+<div className="w-1/2 p-6 bg-gray-800 rounded-lg shadow-lg">
+  <h2 className="text-2xl font-semibold text-white mb-4">Add New Routine</h2>
+  <form onSubmit={handleSubmit} className="space-y-4">
     <div>
-      <h2>Add New Routine</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Routine name input */}
+      <label htmlFor="routineName" className="text-white">Routine Name:</label>
+      <input
+        type="text"
+        id="routineName"
+        value={routineName}
+        onChange={(e) => setRoutineName(e.target.value)}
+        required
+        className="w-full p-2 rounded-md bg-gray-700 text-white"
+      />
+    </div>
+
+    {exercises.map((exercise, index) => (
+      <div key={index} className="space-y-3">
+        <h3 className="text-lg font-medium text-white">Exercise {index + 1}</h3>
         <div>
-          <label htmlFor="routineName">Routine Name:</label>
+          <label htmlFor={`exerciseName-${index}`} className="text-white">Exercise Name:</label>
           <input
             type="text"
-            id="routineName"
-            value={routineName}
-            onChange={(e) => setRoutineName(e.target.value)}
+            id={`exerciseName-${index}`}
+            value={exercise.exercise_name}
+            onChange={(e) => handleExerciseChange(index, 'exercise_name', e.target.value)}
             required
+            className="w-full p-2 rounded-md bg-gray-700 text-white"
           />
         </div>
-
-        {/* Exercise inputs */}
-        {exercises.map((exercise, index) => (
-          <div key={index}>
-            <h3>Exercise {index + 1}</h3>
-            <div>
-              <label htmlFor={`exerciseName-${index}`}>Exercise Name:</label>
-              <input
-                type="text"
-                id={`exerciseName-${index}`}
-                value={exercise.exercise_name}
-                onChange={(e) => handleExerciseChange(index, 'exercise_name', e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor={`sets-${index}`}>Sets:</label>
-              <input
-                type="number"
-                id={`sets-${index}`}
-                value={exercise.sets}
-                onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor={`reps-${index}`}>Reps:</label>
-              <input
-                type="number"
-                id={`reps-${index}`}
-                value={exercise.reps}
-                onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
-                required
-              />
-            </div>
-          </div>
-        ))}
-
-        {/* Add another exercise button */}
         <div>
-          <button type="button" onClick={handleAddExercise}>
-            Add Another Exercise
-          </button>
+          <label htmlFor={`sets-${index}`} className="text-white">Sets:</label>
+          <input
+            type="number"
+            id={`sets-${index}`}
+            value={exercise.sets}
+            onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
+            required
+            className="w-full p-2 rounded-md bg-gray-700 text-white"
+          />
         </div>
-
-        {/* Submit button */}
         <div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Creating Routine...' : 'Create Routine'}
-          </button>
+          <label htmlFor={`reps-${index}`} className="text-white">Reps:</label>
+          <input
+            type="number"
+            id={`reps-${index}`}
+            value={exercise.reps}
+            onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+            required
+            className="w-full p-2 rounded-md bg-gray-700 text-white"
+          />
         </div>
-      </form>
+      </div>
+    ))}
 
-      {/* Error message */}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-        {/* Display the newly created routine */}
-        {createdRoutine && (
-      <div>
-          <h3>Created Routine:</h3>
-          <p><strong>Routine Name:</strong> {createdRoutine.routine_name}</p>
-          <h4>Exercises:</h4>
-          <ul>
-            {createdRoutine.exercises.map((exercise) => (
-              <li key={exercise.routine_exercise_id}>
-                {exercise.exercise_name} - {exercise.sets} sets of {exercise.reps} reps
+    <div>
+      <button
+        type="button"
+        onClick={handleAddExercise}
+        className="px-4 py-2 bg-blue-500 text-white rounded-md"
+      >
+        Add Another Exercise
+      </button>
+    </div>
+
+    <div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="px-4 py-2 bg-green-500 text-white rounded-md"
+      >
+        {loading ? 'Creating Routine...' : 'Create Routine'}
+      </button>
+    </div>
+  </form>
+
+  {error && <p className="text-red-500">{error}</p>}
+</div>
+
+{/* Right Side: Exercises Table */}
+<div className="w-1/2 p-6 bg-gray-800 rounded-lg shadow-lg">
+  {createdRoutine && (
+    <div>
+      <h3 className="text-2xl font-semibold text-white mb-4">Created Routine:</h3>
+      <p className="text-white"><strong>Routine Name:</strong> {createdRoutine.routine_name}</p>
+      <h4 className="text-xl font-semibold text-white mt-4">Exercises:</h4>
+      <table className="table-auto w-full text-white border-collapse mt-4">
+        <thead>
+          <tr className="bg-gray-600">
+            <th className="p-2 border border-gray-500">Exercise Name</th>
+            <th className="p-2 border border-gray-500">Sets</th>
+            <th className="p-2 border border-gray-500">Reps</th>
+            <th className="p-2 border border-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {createdRoutine.exercises.map((exercise) => (
+            <tr key={exercise.routine_exercise_id} className="bg-gray-700">
+              <td className="p-2 border border-gray-500">{exercise.exercise_name}</td>
+              <td className="p-2 border border-gray-500">
+  <input
+    type="number"
+    value={exercise.sets}
+    onChange={(e) => handleExerciseChanges(exercise.routine_exercise_id, 'sets', e.target.value)}
+    className="w-full p-2 rounded-md bg-gray-600 text-white"
+  />
+</td>
+<td className="p-2 border border-gray-500">
+  <input
+    type="number"
+    value={exercise.reps}
+    onChange={(e) => handleExerciseChanges(exercise.routine_exercise_id, 'reps', e.target.value)}
+    className="w-full p-2 rounded-md bg-gray-600 text-white"
+  />
+</td>
+
+              {/* <td className="p-2 border border-gray-500">{exercise.sets}</td>
+              <td className="p-2 border border-gray-500">{exercise.reps}</td> */}
+              
+              <td className="p-2 border border-gray-500">
                 <button
                   onClick={() => handleDeleteExercise(exercise.routine_exercise_id)}
-                  style={{ marginLeft: "10px", color: "red" }}
+                  className="text-red-500 mr-2"
                 >
                   Delete
                 </button>
                 <button
                   onClick={() => handleUpdateExercise(exercise.routine_exercise_id, exercise.sets, exercise.reps)}
-                  style={{ marginLeft: '10px' }}
+                  className="text-blue-500"
                 >
                   Update
                 </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        )}
-      
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
-  );
+  )}
+</div>
+</div>
+);
 };
-  
 
   
   export default Routines;

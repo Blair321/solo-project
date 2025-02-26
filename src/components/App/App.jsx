@@ -127,7 +127,7 @@ function App() {
 <>
       <header className="bg-gray-900 text-white p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-3xl font-semibold">Prime Solo Project</h1>
+          <h1 className="text-3xl font-semibold">Barbell Buddy</h1>
           <Nav />
         </div>
       </header>

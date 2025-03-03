@@ -200,7 +200,7 @@ function App() {
         </Routes>
       </main>
       <footer className="bg-gray-900 text-white text-center p-4">
-        <p>&copy; {new Date().getFullYear()} Prime Solo Project. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()}  All rights reserved.</p>
       </footer>
     </>
   );

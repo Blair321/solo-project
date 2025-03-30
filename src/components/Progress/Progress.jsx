@@ -1,10 +1,11 @@
-function Progress() {
-    return (
+ function Progress() {
+   return (
       <div className="Progress">
         <h1>Progress</h1>
-      </div>
+     </div>
     );
-  }
-  
-  export default Progress;
+   }
+
+export default Progress;
+
   

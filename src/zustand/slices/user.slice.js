@@ -1,70 +1,73 @@
-import axios from 'axios';
-
-// All requests made with axios will include credentials, which means
-// the cookie that corresponds with the session will be sent along
-// inside every request's header
-axios.defaults.withCredentials = true;
-
+// createUserSlice.ts
+import { auth, db } from '../../firebase'; // make sure you import your firebase.ts
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged 
+} from 'firebase/auth';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'; // Firestore functions
 
 const createUserSlice = (set, get) => ({
-  user: {},
+  user: null, // Firebase User Object or null
   authErrorMessage: '',
-  fetchUser: async () => {
-    //  Retrieves the current user's data from the /api/user endpoint.
-    try {
-      const { data } = await axios.get('/api/user');
-      set({ user: data });
-    } catch (err) {
-      console.log('fetchUser error:', err);
-      set({user : {}});
-    }
+
+  fetchUser: () => {
+    // Sets up a listener to keep the user in sync with auth state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        set({ user });
+      } else {
+        set({ user: null });
+      }
+    });
   },
-  register: async (newUserCredentials) => {
-    // Registers a new user by sending a POST request to
-    // /api/user/register, and then attempts to log them in.
+
+  register: async ({ email, password }) => {
     get().setAuthErrorMessage('');
     try {
-      await axios.post('/api/user/register', newUserCredentials);
-      get().logIn(newUserCredentials);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 🔥 Create Firestore document for the new user
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        createdAt: serverTimestamp(),
+        role: 'user', // (optional) Default role
+      });
+
+      set({ authErrorMessage: '' });
     } catch (err) {
       console.log('register error:', err);
-      get().setAuthErrorMessage('Oops! Registration failed. That username might already be taken. Try again!');
+      get().setAuthErrorMessage(err.message || 'Registration failed.');
     }
   },
-  logIn: async (userCredentials) => {
-    // Logs in an existing user by sending a POST request
-    // to /api/user/login and then retrieves their data.
-    get().setAuthErrorMessage('')
+  logIn: async ({ email, password }) => {
+    get().setAuthErrorMessage('');
     try {
-      await axios.post('/api/user/login', userCredentials);
-      get().fetchUser();
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
       console.log('logIn error:', err);
-      if (err.response.status === 401) {
-        // 401 is the status code sent from passport if user isn't in the database or
-        // if the username and password don't match in the database, so:
-        get().setAuthErrorMessage('Oops! Login failed. You have entered an invalid username or password. Try again!');
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        get().setAuthErrorMessage('Invalid email or password.');
       } else {
-        // Got an error that wasn't status 401, so we'll show a more generic error:
-        get().setAuthErrorMessage('Oops! Login failed. It might be our fault. Try again!');
+        get().setAuthErrorMessage('Login failed. Try again.');
       }
     }
   },
-  logOut : async () => {
-    // Logs out the current user by sending a POST request to
-    // /api/user/logout, and then clears their data.
+
+  logOut: async () => {
     try {
-      await axios.post('/api/user/logout');
-      set({user : {}});
+      await signOut(auth);
+      set({ user: null });
     } catch (err) {
       console.log('logOut error:', err);
     }
   },
-  setAuthErrorMessage: (message) => {
-    // Sets an error message for authentication-related issues.
-    set({authErrorMessage : message})
-  }
-})
 
+  setAuthErrorMessage: (message) => {
+    set({ authErrorMessage: message });
+  },
+});
 
 export default createUserSlice;

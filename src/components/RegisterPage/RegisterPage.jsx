@@ -1,28 +1,25 @@
 import { useState, useEffect } from 'react';
 import useStore from '../../zustand/store';
 
-
 function RegisterPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // 🔥 change to email
   const [password, setPassword] = useState('');
-  const register = useStore((state) => state.register)
+  const register = useStore((state) => state.register);
   const errorMessage = useStore((state) => state.authErrorMessage);
   const setAuthErrorMessage = useStore((state) => state.setAuthErrorMessage);
 
   useEffect(() => {
-    // Clear the auth error message when the component unmounts:
     return () => {
       setAuthErrorMessage('');
-    }
-  }, [])
+    };
+  }, []);
 
   const handleRegister = (event) => {
     event.preventDefault();
-
     register({
-      username: username,
+      email: email,
       password: password,
-    })
+    });
   };
 
   return (
@@ -31,13 +28,13 @@ function RegisterPage() {
         <h2 className="text-3xl font-semibold text-center text-gray-200 mb-6">Register</h2>
         <form onSubmit={handleRegister}>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-300">Username:</label>
+            <label htmlFor="email" className="block text-gray-300">Email:</label> {/* 🔥 Email not Username */}
             <input
-              type="text"
-              id="username"
+              type="email"
+              id="email"
               required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-2 mt-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -64,7 +61,6 @@ function RegisterPage() {
           </div>
         </form>
 
-        {/* Conditionally render registration error */}
         {errorMessage && (
           <div className="text-red-500 text-center mt-4">
             <h3>{errorMessage}</h3>
@@ -74,37 +70,5 @@ function RegisterPage() {
     </main>
   );
 }
-//     <>
-//       <h2>Register Page</h2>
-//       <form onSubmit={handleRegister}>
-//         <label htmlFor="username">Username:</label>
-//         <input
-//           type="text"
-//           id="username"
-//           required
-//           value={username}
-//           onChange={(e) => setUsername(e.target.value)}
-//         />
-//         <label htmlFor="password">Password:</label>
-//         <input
-//           type="password"
-//           id="password"
-//           required
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//         />
-//         <button type="submit">
-//           Register 
-//         </button>
-//       </form>
-//       { // Conditionally render registration error:
-//         errorMessage && (
-//           <h3>{errorMessage}</h3>
-//         )
-//       }
-//     </>
-//   );
-// }
-
 
 export default RegisterPage;

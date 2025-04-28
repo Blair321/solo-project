@@ -1,53 +1,49 @@
 import { NavLink } from 'react-router-dom';
 import useStore from '../../zustand/store';
 
-
 function Nav() {
   const user = useStore((store) => store.user);
 
   return (
     <nav>
-      <ul>
-      { // User is not logged in, render these links:
-        !user.id && (
+      <ul className="flex space-x-4">
+        {/* User is not logged in, show Login/Register links */}
+        {!user?.uid && (
           <>
             <li>
-              <NavLink to="/login">Login</NavLink>
+              <NavLink to="/login" className="hover:underline">Login</NavLink>
             </li>
             <li>
-              <NavLink to="/registration">Register</NavLink>
+              <NavLink to="/registration" className="hover:underline">Register</NavLink>
             </li>
           </>
-        )
-      }
-      { // User is logged in, render these links:
-        user.id && (
+        )}
+
+        {/* User is logged in, show app links */}
+        {user?.uid && (
           <>
             <li>
-              <NavLink to="/">Home</NavLink>
+              <NavLink to="/" className="hover:underline">Home</NavLink>
             </li>
             <li>
-              <NavLink to="/Log">Log</NavLink>
+              <NavLink to="/Log" className="hover:underline">Log</NavLink>
             </li>
             <li>
-            <NavLink to="/Progress">Progress</NavLink>
+              <NavLink to="/Progress" className="hover:underline">Progress</NavLink>
             </li>
             <li>
-            <NavLink to="/Routines">Routines</NavLink>
+              <NavLink to="/Routines" className="hover:underline">Routines</NavLink>
             </li>
           </>
-        )
-      }
-      {/* Show these links regardless of auth status: */}
+        )}
+
+        {/* Always show About link */}
         <li>
-          <NavLink to="/about">About</NavLink>
+          <NavLink to="/about" className="hover:underline">About</NavLink>
         </li>
-
-
       </ul>
     </nav>
   );
 }
-
 
 export default Nav;

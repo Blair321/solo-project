@@ -1,7 +1,12 @@
-import { useEffect, useState } from 'react';
-import { db } from '../../firebase';
-import { collection, getDocs, addDoc, query, orderBy, Timestamp } from 'firebase/firestore';
-import useStore from '../../zustand/store';
+import { useEffect, useState } from "react";
+import { db } from "../../firebase";
+import useStore from "../../zustand/store";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  Timestamp,
+} from "firebase/firestore";
 
 const Log = () => {
   const user = useStore((state) => state.user);
@@ -19,11 +24,11 @@ const Log = () => {
     }
   }, [user]);
 
+  // Fetch logs from workouts subcollection
   const fetchLogs = async () => {
     try {
       const logsRef = collection(db, 'users', user.uid, 'workouts');
-      const logsQuery = query(logsRef, orderBy('timestamp', 'desc'));
-      const querySnapshot = await getDocs(logsQuery);
+      const querySnapshot = await getDocs(logsRef);
       const logs = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
@@ -34,6 +39,7 @@ const Log = () => {
     }
   };
 
+  // Handle log submission and store progress logs
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -51,11 +57,25 @@ const Log = () => {
       timestamp: Timestamp.now(),
     };
 
+    const newProgressLog = {
+      exercise,
+      weight: Number(weight),
+      reps: Number(reps),
+      date: Timestamp.now(),
+    };
+
     try {
+      // Store workout log in "workouts" collection
       const logsRef = collection(db, 'users', user.uid, 'workouts');
       await addDoc(logsRef, newLog);
-      fetchLogs();
 
+      // Store progress log in "progressLogs" collection for progress tracking
+      const progressRef = collection(db, 'users', user.uid, 'progressLogs');
+      await addDoc(progressRef, newProgressLog);
+
+      fetchLogs(); // Fetch updated logs
+
+      // Reset form fields after successful submission
       setExercise('');
       setSetNumber('');
       setReps('');
@@ -126,7 +146,8 @@ const Log = () => {
         </form>
       </section>
 
-      <section className="bg-gray-700 w-full max-w-4xl p-6 rounded-lg shadow-md">
+      {/* Your exercise log display section */}
+      <section className="bg-gray-700 w-full max-w-4xl p-6 rounded-lg shadow-md mt-6">
         <h2 className="text-2xl font-semibold mb-4 text-center">Your Exercise Logs</h2>
         {logList.length === 0 ? (
           <p className="text-center text-gray-300">No logs found.</p>
